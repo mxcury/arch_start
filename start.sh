@@ -60,11 +60,10 @@ install_core_packages() {
     # Core Hyprland and Wayland packages
     CORE_PACKAGES=(
         "hyprland"
+        "xdg-desktop-portal-hyprland"
         "waybar"
         "rofi-wayland"
-        "wofi"
         "fuzzel"
-        "dunst"
         "mako"
         "swww"
         "hyprpaper"
@@ -72,7 +71,6 @@ install_core_packages() {
         "grim"
         "slurp"
         "wl-clipboard"
-        "xdg-desktop-portal-hyprland"
     )
     
     sudo pacman -S --needed "${CORE_PACKAGES[@]}"
@@ -85,20 +83,15 @@ install_tui_apps() {
     
     TUI_PACKAGES=(
         "kitty"
-        "alacritty"
         "btop"
-        "htop"
         "ranger"
         "neovim"
         "neofetch"
         "figlet"
         "toilet"
-        "cmatrix"
         "cava"
-        "ncmpcpp"
         "pulsemixer"
         "lazygit"
-        "tig"
         "fzf"
         "ripgrep"
         "eza"
@@ -120,20 +113,15 @@ install_aur_packages() {
     print_status "Installing AUR packages..."
     
     AUR_PACKAGES=(
-        "gotop-bin"
         "pfetch"
         "onefetch"
         "jp2a"
         "python-pywal"
         "colorscript-collection-git"
         "spotify-tui"
-        "gitui"
-        "chezmoi"
+        "spotifyd"
         "starship"
         "eww-wayland"
-        "micro"
-        "lf"
-        "nnn"
     )
     
     for package in "${AUR_PACKAGES[@]}"; do
@@ -156,7 +144,6 @@ setup_zsh() {
     fi
 }
 
-# Setup dotfiles directory structure with Stow
 setup_dotfiles_structure() {
     print_status "Setting up dotfiles structure with GNU Stow..."
     
@@ -164,19 +151,25 @@ setup_dotfiles_structure() {
     DOTFILES_DIR="$HOME/.dotfiles"
     mkdir -p "$DOTFILES_DIR"
     
-    # Create package directories for Stow
+    # Create package directories for Stow (based on your actual package selection)
     STOW_PACKAGES=(
         "hypr"
         "waybar" 
         "kitty"
-        "alacritty"
         "rofi"
-        "dunst"
+        "fuzzel"
+        "mako"
+        "swww"
+        "hyprpaper"
         "cava"
         "ranger"
         "nvim"
         "zsh"
+        "starship"
+        "spotifyd"  
+        "eww"
         "scripts"
+        "themes"
     )
     
     for package in "${STOW_PACKAGES[@]}"; do
@@ -187,18 +180,27 @@ setup_dotfiles_structure() {
     mkdir -p "$DOTFILES_DIR/hypr/.config/hypr"
     mkdir -p "$DOTFILES_DIR/waybar/.config/waybar"
     mkdir -p "$DOTFILES_DIR/kitty/.config/kitty"
-    mkdir -p "$DOTFILES_DIR/alacritty/.config/alacritty"
     mkdir -p "$DOTFILES_DIR/rofi/.config/rofi"
-    mkdir -p "$DOTFILES_DIR/dunst/.config/dunst"
+    mkdir -p "$DOTFILES_DIR/fuzzel/.config/fuzzel"
+    mkdir -p "$DOTFILES_DIR/mako/.config/mako"
+    mkdir -p "$DOTFILES_DIR/swww/.config/swww"
     mkdir -p "$DOTFILES_DIR/cava/.config/cava"
     mkdir -p "$DOTFILES_DIR/ranger/.config/ranger"
     mkdir -p "$DOTFILES_DIR/nvim/.config/nvim"
+    mkdir -p "$DOTFILES_DIR/eww/.config/eww"
+    mkdir -p "$DOTFILES_DIR/spotifyd/.config/spotifyd"
+    
+    # Home directory configs (not in .config)
+    mkdir -p "$DOTFILES_DIR/zsh"  # For .zshrc, .zshenv, etc.
+    mkdir -p "$DOTFILES_DIR/starship/.config"  # starship.toml goes in .config
+    
+    # Scripts and themes
     mkdir -p "$DOTFILES_DIR/scripts/.local/bin"
+    mkdir -p "$DOTFILES_DIR/themes/.config/wal"  # pywal themes
     
-    # Create other directories
+    # Create other useful directories
     mkdir -p "$HOME/wallpapers"
-    
-    print_success "Dotfiles structure created at $DOTFILES_DIR!"
+    mkdir -p "$HOME/.local/bin"  # For your scripts
 }
 
 # Create basic Hyprland configuration
@@ -1001,19 +1003,25 @@ apply_stow_configs() {
 install_fonts() {
     print_status "Installing fonts..."
     
+    # Essential fonts
     FONT_PACKAGES=(
-        "ttf-jetbrains-mono"
-        "noto-fonts"
-        "noto-fonts-emoji"
-        "ttf-font-awesome"
+        "noto-fonts-emoji"        # Emoji support - essential for modern interfaces
     )
     
     sudo pacman -S --needed "${FONT_PACKAGES[@]}"
     
-    # Install Nerd Fonts
-    paru -S --noconfirm nerd-fonts-jetbrains-mono || print_warning "Failed to install JetBrains Mono Nerd Font"
+    # Install JetBrains Mono Nerd Font 
+    print_status "Installing JetBrains Mono Nerd Font"
+    paru -S --noconfirm nerd-fonts-jetbrains-mono || {
+        print_warning "Failed to install Nerd Font, falling back to regular JetBrains Mono"
+        sudo pacman -S --needed ttf-jetbrains-mono
+    }
     
-    print_success "Fonts installed!"
+    # Refresh font cache so new fonts are immediately available
+    print_status "Refreshing font cache..."
+    fc-cache -fv > /dev/null 2>&1
+    
+    print_success "Fonts installed and cache refreshed!"
 }
 
 # Final setup instructions
