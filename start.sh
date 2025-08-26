@@ -84,7 +84,6 @@ install_tui_apps() {
     TUI_PACKAGES=(
         "kitty"
         "btop"
-        "ranger"
         "neovim"
         "neofetch"
         "figlet"
@@ -115,6 +114,7 @@ install_aur_packages() {
     AUR_PACKAGES=(
         "pfetch"
         "onefetch"
+        "yazi"
         "jp2a"
         "python-pywal"
         "colorscript-collection-git"
